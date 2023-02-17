@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+
+<body style="background-color: #48ca48">
+  <div class="container" style="margin-top: 50px">
+    <h2 class="text-center" style="color: white">User Details</h2>
+    <hr style="background-color: white; height: 1px">
+    <div class="row" style="margin-top: 50px">
+      <div class="col-sm-3"></div>
+      <div class="col-sm-6">
+        <p style="color: white"><strong>First Name:</strong> {{user.first_name }}</p>
+        <p style="color: white"><strong>Last Name:</strong> {{user.last_name }}</p>
+        <p style="color: white"><strong>Email Address:</strong> {{user.email}}</p>
+        <p style="color: white"><strong>No of Skills Registered:</strong></p>
+        <ul style="color: white">
+          {% for skill in user.skills.all %}
+          <li>{{skill.name}}</li>
+          {% endfor %}
+
+        </ul>
+        <button type="button" class="btn btn-success" onclick="payWithPaystack()"
+          style="margin-top: 20px; width: 100%">Make Payment</button>
+        <div id="paypal-button-container"></div>
+      </div>
+      <div class="col-sm-3"></div>
+    </div>
+  </div>
+  <script>
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          // Does this cookie string begin with the name we want?
+          if (cookie.substring(0, name.length + 1) === (name + '=')) {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
+  </script>
+  <script>
+    var email = "otunlaisaac8@gmail.com";
+    var reference = "{{user.uuid}}"
+
+    function payWithPaystack() {
+      let handler = PaystackPop.setup({
+        key: 'pk_test_156f4146fc0313965732ceb3ddd1ec7c79ac60fc', // Replace with your public key
+        email: email,
+        amount: 2000 * 100,
+        ref: reference, // generates a pseudo-unique reference. Please replace with a reference you generated. Or remove the line entirely so our API will generate one for you
+        // label: "Optional string that replaces customer email"
+        onClose: function () {
+          alert('Window closed.');
+        },
+        callback: function (response) {
+          let message = 'Payment complete! Reference: ' + response.reference;
+          let order_id = response.reference;
+          alert(message);
+          function createTicket(order_id) {
+            // todo: add befored send 
+            const orderId = response.reference
+            const method = 'POST'
+            const requestUrl = `/tickets/create`
+            const responseType = "json"
+            const data = JSON.stringify({ order_id: orderId })
+            const xhr = new XMLHttpRequest()
+            const csrftoken = getCookie("csrftoken")
+            xhr.open(method, requestUrl)
+            xhr.responseType = responseType
+            xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest")
+            xhr.setRequestHeader("HTTP_X_REQUESTED_WITH", "XMLHttpRequest")
+            xhr.setRequestHeader("Content-Type", "application/json")
+            xhr.setRequestHeader("X-CSRFToken", csrftoken)
+            xhr.onload = function () {
+              const response = xhr.response
+              console.log(response)
+              if (xhr.status === 200) {
+                const redirect_url = xhr.response.url
+                window.location.href = `${window.location.protocol}//${redirect_url}`
+              }
+            }
+            xhr.send(data)
+          }
+          createTicket(order_id)
+        },
+      });
+
+      handler.openIframe();
+    }
+  </script>
+  <script src="https://js.paystack.co/v1/inline.js"></script>
+</body>
+
+
+</html>

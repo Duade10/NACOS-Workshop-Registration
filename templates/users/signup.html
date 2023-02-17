@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <style>
+        .btn-primary {
+            background-color: #48ca48;
+            border-color: #48ca48;
+        }
+
+        .form-control:focus {
+            border-color: #48ca48;
+            box-shadow: 0 0 0 0.2rem rgba(72, 202, 72, 0.25);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container mt-5">
+        {% if request.GET.command != "verification" %}
+        <form method="POST" action="{% url 'users:sign_up' %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="firstName">First Name</label>
+                {{form.first_name}}
+                <small id="firstNameHelp" class="form-text text-muted">Please enter your first name.</small>
+            </div>
+            <div class="form-group">
+                <label for="lastName">Last Name</label>
+                {{form.last_name}}
+                <small id="lastNameHelp" class="form-text text-muted">Please enter your last name.</small>
+            </div>
+            <div class="form-group">
+                <label for="email">Email address</label>
+                {{form.email}}
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                {{form.phone_number}}
+            </div>
+            <div class="form-group">
+                <label for="skills">Skills</label>
+                {{form.skills}}
+                <!-- <select multiple class="form-control" id="skills">
+                    {% for skill in skills %}
+                    <option value="{{skill.id}}">{{skill.name}}</option>
+                    {% endfor %}
+                </select> -->
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Submit</button>
+        </form>
+        {% else %}
+
+        <div style="background-color: #48ca48; color: white;" class="alert alert-success" role="alert">
+            We have sent a confirmation message to {{request.GET.email}}
+        </div>
+
+        {% endif %}
+    </div>
+</body>
+
+</html>
