@@ -142,8 +142,6 @@
                     unit: "pt",
                     format: [canvas.width, canvas.height],
                 });
-
-                // Add the image to the PDF document
                 doc.addImage(
                     canvas.toDataURL("image/png"),
                     "PNG",
